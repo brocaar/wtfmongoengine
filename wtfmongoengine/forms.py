@@ -75,6 +75,20 @@ class DocumentFieldConverter(object):
         self.set_common_string_kwargs(document_field, kwargs)
         return fields.TextField(**kwargs)
 
+    def from_urlfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``TextField`` with URL validation.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.TextField`.
+
+        """
+        kwargs['validators'].append(validators.URL())
+        self.set_common_string_kwargs(document_field, kwargs)
+        return fields.TextField(**kwargs)
 
 class DocumentFormMetaClassBase(type):
     """

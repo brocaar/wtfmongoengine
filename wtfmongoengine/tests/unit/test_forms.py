@@ -258,14 +258,30 @@ class DocumentFieldConverterTestCase(TestCase):
         converter.set_common_string_kwargs = Mock()
         result = converter.from_stringfield(document_field, foo='bar')
 
+        converter.set_common_string_kwargs.assert_called_once_with(
+            document_field, {'foo': 'bar'})
         fields.TextField.assert_called_once_with(foo='bar')
         self.assertEqual('text-field', result)
 
-    def test_from_urlfield(self):
+    @patch('wtfmongoengine.forms.validators')
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_urlfield(self, fields, validators):
         """
         Test :py:meth:`.DocumentFieldConverter.from_urlfield`.
         """
-        pass
+        validators.URL.return_value = 'url-validator'
+
+        fields.TextField.return_value = 'text-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs = Mock()
+        result = converter.from_urlfield(document_field, validators=[])
+
+        converter.set_common_string_kwargs.assert_called_once_with(
+            document_field, {'validators': ['url-validator']}
+        )
+        self.assertEqual('text-field', result)
 
     def test_from_emailfield(self):
         """
