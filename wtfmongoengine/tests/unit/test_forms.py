@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from wtfmongoengine.forms import DocumentFormMetaClassBase
+from wtfmongoengine.forms import (
+    DocumentFormMetaClassBase, DocumentFieldConverter)
 
 
 class DocumentFormMetaClassBaseTestCase(TestCase):
@@ -99,3 +100,85 @@ class DocumentFormMetaClassBaseTestCase(TestCase):
             'body': 'body-value',
             'timestamp': 'timestamp-value',
         }, result)
+
+
+class DocumentFieldConverterTestCase(TestCase):
+    """
+    Test :py:class:`.DocumentFieldConverter`.
+    """
+    @patch('wtfmongoengine.forms.validators')
+    def test_convert(self, validators):
+        """
+        Test ``convert`` without choices.
+
+        Tests :py:meth:`.DocumentFieldConverter.convert`.
+        """
+        validators.Required.return_value = 'required'
+
+        class DocumentFieldMock(object):
+            name = 'test field'
+            required = True
+            default = 'empty'
+            choices = None
+
+        document_field = DocumentFieldMock()
+
+        converter = DocumentFieldConverter()
+        converter.from_documentfieldmock = Mock(return_value='wtfield')
+
+        result = converter.convert(document_field)
+
+        converter.from_documentfieldmock.assert_called_once_with(
+            document_field,
+            label='test field',
+            validators=['required'],
+            default='empty',
+        )
+
+        self.assertEqual('wtfield', result)
+
+    @patch('wtfmongoengine.forms.fields')
+    def test_convert_choices(self, fields):
+        """
+        Test ``convert`` with choices.
+
+        Tests :py:meth:`.DocumentFieldConverter.convert`.
+        """
+        fields.SelectField.return_value = 'select-field'
+
+        class DocumentFieldMock(object):
+            name = 'test field'
+            required = False
+            default = 'empty'
+            choices = [('a', 'Choice A'), ('b', 'Choice B')]
+
+        converter = DocumentFieldConverter()
+
+        result = converter.convert(DocumentFieldMock())
+
+        fields.SelectField.assert_called_once_with(
+            label='test field',
+            validators=[],
+            default='empty',
+            choices=[('a', 'Choice A'), ('b', 'Choice B')]
+        )
+
+        self.assertEqual('select-field', result)
+
+    def test_convert_return_none(self):
+        """
+        Test the situation where ``convert`` returns ``None``.
+
+        This happens when the field is not convertable to a WTForms field.
+
+        Tests :py:meth:`.DocumentFieldConverter.convert`.
+        """
+        class DocumentFieldMock(object):
+            name = 'test field'
+            required = False
+            default = ''
+            choices = []
+
+        converter = DocumentFieldConverter()
+        result = converter.convert(DocumentFieldMock())
+        self.assertEqual(None, result)

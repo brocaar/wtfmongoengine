@@ -1,10 +1,41 @@
+from wtforms import validators, fields
 from wtforms.form import Form, FormMeta
 
 
 class DocumentFieldConverter(object):
 
-    def convert(self, model_field):
-        return model_field
+    def convert(self, document_field):
+        """
+        Convert ``document_field`` into a WTForms field.
+
+        :param document_field:
+            Instance of a Mongoengine field class.
+
+        :return:
+            Instance of a WTForms instance.
+
+        """
+        kwargs = {
+            'label': document_field.name,
+            'validators': [],
+            'default': document_field.default,
+        }
+
+        if document_field.required:
+            kwargs['validators'].append(validators.Required())
+
+        if document_field.choices:
+            kwargs['choices'] = document_field.choices
+            return fields.SelectField(**kwargs)
+
+        document_field_type = type(document_field).__name__
+
+        convert_method_name = 'from_{0}'.format(document_field_type.lower())
+
+        if hasattr(self, convert_method_name):
+            return getattr(self, convert_method_name)(document_field, **kwargs)
+        else:
+            return None
 
 
 class DocumentFormMetaClassBase(type):
