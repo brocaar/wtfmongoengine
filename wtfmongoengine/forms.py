@@ -166,6 +166,39 @@ class DocumentFieldConverter(object):
         self.set_common_number_kwargs(document_field, kwargs)
         return fields.DecimalField(**kwargs)
 
+    def from_datetimefield(self, document_field, **kwargs):
+        return None
+
+    def from_complexdatetimefield(self, document_field, **kwargs):
+        return None
+
+    def from_listfield(self, document_field, **kwargs):
+        return None
+
+    def from_sortedlistfield(self, document_field, **kwargs):
+        return None
+
+    def from_dictfield(self, document_field, **kwargs):
+        return None
+
+    def from_mapfield(self, document_field, **kwargs):
+        return None
+
+    def from_objectidfield(self, document_field, **kwargs):
+        return None
+
+    def from_referencefield(self, document_field, **kwargs):
+        return None
+
+    def from_genericreferencefield(self, document_field, **kwargs):
+        return None
+
+    def from_embeddeddocumentfield(self, document_field, **kwargs):
+        return None
+
+    def from_genericembeddeddocumentfield(self, document_field, **kwargs):
+        return None
+
     def from_booleanfield(self, document_field, **kwargs):
         """
         Convert ``document_field`` into a ``BooleanField``.
@@ -178,6 +211,18 @@ class DocumentFieldConverter(object):
 
         """
         return fields.BooleanField(**kwargs)
+
+    def from_filefield(self, document_field, **kwargs):
+        return None
+
+    def from_binaryfield(self, document_field, **kwargs):
+        return None
+
+    def from_geopointfield(self, document_field, **kwargs):
+        return None
+
+    def from_sequencefield(self, document_field, **kwargs):
+        pass
 
 
 class DocumentFormMetaClassBase(type):
