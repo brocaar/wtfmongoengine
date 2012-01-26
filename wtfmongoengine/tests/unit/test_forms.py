@@ -246,11 +246,20 @@ class DocumentFieldConverterTestCase(TestCase):
 
         validators.Length.assert_called_once_with(max=10, min=-1)
 
-    def test_from_stringfield(self):
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_stringfield(self, fields):
         """
         Test :py:meth:`.DocumentFieldConverter.from_stringfield`.
         """
-        pass
+        fields.TextField.return_value = 'text-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs = Mock()
+        result = converter.from_stringfield(document_field, foo='bar')
+
+        fields.TextField.assert_called_once_with(foo='bar')
+        self.assertEqual('text-field', result)
 
     def test_from_urlfield(self):
         """

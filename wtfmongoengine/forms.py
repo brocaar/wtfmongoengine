@@ -72,7 +72,8 @@ class DocumentFieldConverter(object):
             Instance of :py:class:`!wtforms.fields.TextField`.
 
         """
-        pass
+        self.set_common_string_kwargs(document_field, kwargs)
+        return fields.TextField(**kwargs)
 
 
 class DocumentFormMetaClassBase(type):
