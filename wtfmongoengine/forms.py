@@ -90,6 +90,22 @@ class DocumentFieldConverter(object):
         self.set_common_string_kwargs(document_field, kwargs)
         return fields.TextField(**kwargs)
 
+    def from_emailfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``TextField`` with e-mail validation.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.TextField`.
+
+        """
+        kwargs['validators'].append(validators.Email())
+        self.set_common_string_kwargs(document_field, kwargs)
+        return fields.TextField(**kwargs)
+
+
 class DocumentFormMetaClassBase(type):
     """
     Meta-class for generating the actual WTForms class.

@@ -283,11 +283,25 @@ class DocumentFieldConverterTestCase(TestCase):
         )
         self.assertEqual('text-field', result)
 
-    def test_from_emailfield(self):
+    @patch('wtfmongoengine.forms.validators')
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_emailfield(self, fields, validators):
         """
         Test :py:meth:`.DocumentFieldConverter.from_emailfield`.
         """
-        pass
+        validators.Email.return_value = 'email-validator'
+
+        fields.TextField.return_value = 'text-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs = Mock()
+        result = converter.from_emailfield(document_field, validators=[])
+
+        converter.set_common_string_kwargs.assert_called_once_with(
+            document_field, {'validators': ['email-validator']}
+        )
+        self.assertEqual('text-field', result)
 
     def test_from_intfield(self):
         """
