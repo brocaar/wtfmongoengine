@@ -138,6 +138,20 @@ class DocumentFieldConverter(object):
         self.set_common_number_kwargs(document_field, kwargs)
         return fields.IntegerField(**kwargs)
 
+    def from_floatfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``FloatField``.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.FloatField`.
+
+        """
+        self.set_common_number_kwargs(document_field, kwargs)
+        return fields.FloatField(**kwargs)
+
 
 class DocumentFormMetaClassBase(type):
     """

@@ -298,8 +298,7 @@ class DocumentFieldConverterTestCase(TestCase):
         result = converter.from_urlfield(document_field, validators=[])
 
         converter.set_common_string_kwargs.assert_called_once_with(
-            document_field, {'validators': ['url-validator']}
-        )
+            document_field, {'validators': ['url-validator']})
         self.assertEqual('text-field', result)
 
     @patch('wtfmongoengine.forms.validators')
@@ -318,8 +317,7 @@ class DocumentFieldConverterTestCase(TestCase):
         result = converter.from_emailfield(document_field, validators=[])
 
         converter.set_common_string_kwargs.assert_called_once_with(
-            document_field, {'validators': ['email-validator']}
-        )
+            document_field, {'validators': ['email-validator']})
         self.assertEqual('text-field', result)
 
     @patch('wtfmongoengine.forms.fields')
@@ -335,15 +333,24 @@ class DocumentFieldConverterTestCase(TestCase):
         result = converter.from_intfield(document_field, validators=[])
 
         converter.set_common_number_kwargs.assert_called_once_with(
-            document_field, {'validators': []}
-        )
+            document_field, {'validators': []})
         self.assertEqual('integer-field', result)
 
-    def test_from_floatfield(self):
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_floatfield(self, fields):
         """
         Test :py:meth:`.DocumentFieldConverter.from_floatfield`.
         """
-        pass
+        fields.FloatField.return_value = 'float-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_number_kwargs = Mock()
+        result = converter.from_floatfield(document_field, validators=[])
+
+        converter.set_common_number_kwargs.assert_called_once_with(
+            document_field, {'validators': []})
+        self.assertEqual('float-field', result)
 
     def test_from_decimalfield(self):
         """
