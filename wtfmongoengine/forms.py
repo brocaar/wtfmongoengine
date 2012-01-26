@@ -152,6 +152,33 @@ class DocumentFieldConverter(object):
         self.set_common_number_kwargs(document_field, kwargs)
         return fields.FloatField(**kwargs)
 
+    def from_decimalfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``DecimalField``.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.DecimalField`.
+
+        """
+        self.set_common_number_kwargs(document_field, kwargs)
+        return fields.DecimalField(**kwargs)
+
+    def from_booleanfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``BooleanField``.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.BooleanField`.
+
+        """
+        return fields.BooleanField(**kwargs)
+
 
 class DocumentFormMetaClassBase(type):
     """

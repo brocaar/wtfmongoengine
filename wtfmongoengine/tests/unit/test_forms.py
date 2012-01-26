@@ -299,6 +299,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         converter.set_common_string_kwargs.assert_called_once_with(
             document_field, {'validators': ['url-validator']})
+        fields.TextField.assert_called_once_with(validators=['url-validator'])
         self.assertEqual('text-field', result)
 
     @patch('wtfmongoengine.forms.validators')
@@ -318,6 +319,8 @@ class DocumentFieldConverterTestCase(TestCase):
 
         converter.set_common_string_kwargs.assert_called_once_with(
             document_field, {'validators': ['email-validator']})
+        fields.TextField.assert_called_once_with(
+            validators=['email-validator'])
         self.assertEqual('text-field', result)
 
     @patch('wtfmongoengine.forms.fields')
@@ -334,6 +337,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         converter.set_common_number_kwargs.assert_called_once_with(
             document_field, {'validators': []})
+        fields.IntegerField.assert_called_once_with(validators=[])
         self.assertEqual('integer-field', result)
 
     @patch('wtfmongoengine.forms.fields')
@@ -350,10 +354,36 @@ class DocumentFieldConverterTestCase(TestCase):
 
         converter.set_common_number_kwargs.assert_called_once_with(
             document_field, {'validators': []})
+        fields.FloatField.assert_called_once_with(validators=[])
         self.assertEqual('float-field', result)
 
-    def test_from_decimalfield(self):
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_decimalfield(self, fields):
         """
         Test :py:meth:`.DocumentFieldConverter.from_decimalfield`.
         """
-        pass
+        fields.DecimalField.return_value = 'decimal-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_number_kwargs = Mock()
+        result = converter.from_decimalfield(document_field, validators=[])
+
+        converter.set_common_number_kwargs.assert_called_once_with(
+            document_field, {'validators': []})
+        fields.DecimalField.assert_called_once_with(validators=[])
+        self.assertEqual('decimal-field', result)
+
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_booleanfield(self, fields):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_booleanfield`.
+        """
+        fields.BooleanField.return_value = 'boolean-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        result = converter.from_booleanfield(document_field, validators=[])
+
+        fields.BooleanField.assert_called_once_with(validators=[])
+        self.assertEqual('boolean-field', result)
