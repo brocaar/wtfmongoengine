@@ -322,11 +322,22 @@ class DocumentFieldConverterTestCase(TestCase):
         )
         self.assertEqual('text-field', result)
 
-    def test_from_intfield(self):
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_intfield(self, fields):
         """
         Test :py:meth:`.DocumentFieldConverter.from_intfield`.
         """
-        pass
+        fields.IntegerField.return_value = 'integer-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        converter.set_common_number_kwargs = Mock()
+        result = converter.from_intfield(document_field, validators=[])
+
+        converter.set_common_number_kwargs.assert_called_once_with(
+            document_field, {'validators': []}
+        )
+        self.assertEqual('integer-field', result)
 
     def test_from_floatfield(self):
         """

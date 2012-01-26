@@ -124,6 +124,20 @@ class DocumentFieldConverter(object):
         self.set_common_string_kwargs(document_field, kwargs)
         return fields.TextField(**kwargs)
 
+    def from_intfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``IntegerField``.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.IntegerField`.
+
+        """
+        self.set_common_number_kwargs(document_field, kwargs)
+        return fields.IntegerField(**kwargs)
+
 
 class DocumentFormMetaClassBase(type):
     """
