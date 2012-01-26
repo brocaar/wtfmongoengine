@@ -39,7 +39,7 @@ class DocumentFieldConverter(object):
 
     def set_common_string_kwargs(self, document_field, kwargs):
         """
-        Set commong string arguments.
+        Set common string arguments.
 
         :param document_field:
             Instance of Mongoengine field.
@@ -59,6 +59,25 @@ class DocumentFieldConverter(object):
         if document_field.regex:
             kwargs['validators'].append(
                 validators.Regexp(regex=document_field.regex)
+            )
+
+    def set_common_number_kwargs(self, document_field, kwargs):
+        """
+        Set common number arguments.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :param kwargs:
+            A ``dict`` that needs to be updated with the new arguments.
+
+        """
+        if document_field.max_value or document_field.min_value:
+            kwargs['validators'].append(
+                validators.NumberRange(
+                    max=document_field.max_value,
+                    min=document_field.min_value
+                )
             )
 
     def from_stringfield(self, document_field, **kwargs):

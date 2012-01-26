@@ -246,6 +246,25 @@ class DocumentFieldConverterTestCase(TestCase):
 
         validators.Length.assert_called_once_with(max=10, min=-1)
 
+    @patch('wtfmongoengine.forms.validators')
+    def test_common_number_kwargs_no_max(self, validators):
+        """
+        Test :py:meth:`.DocumentFieldConverter.set_common_number_kwargs`.
+        """
+        validators.NumberRange.return_value = 'number-range-validator'
+
+        document_field = Mock()
+        document_field.max_value = 20
+        document_field.min_value = 10
+
+        kwargs = {'validators': []}
+
+        converter = DocumentFieldConverter()
+        converter.set_common_number_kwargs(document_field, kwargs)
+
+        validators.NumberRange.assert_called_once_with(max=20, min=10)
+        self.assertEqual({'validators': ['number-range-validator']}, kwargs)
+
     @patch('wtfmongoengine.forms.fields')
     def test_from_stringfield(self, fields):
         """
