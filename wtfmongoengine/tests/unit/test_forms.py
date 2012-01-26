@@ -182,3 +182,102 @@ class DocumentFieldConverterTestCase(TestCase):
         converter = DocumentFieldConverter()
         result = converter.convert(DocumentFieldMock())
         self.assertEqual(None, result)
+
+    @patch('wtfmongoengine.forms.validators')
+    def test_common_string_kwargs(self, validators):
+        """
+        Test setting common string arguments.
+
+        Tests :py:meth:`.DocumentFieldConverter.set_common_string_kwargs`.
+        """
+        validators.Length.return_value = 'length-validator'
+        validators.Regexp.return_value = 'regexp-validator'
+
+        class DocumentFieldMock(object):
+            max_length = 10
+            min_length = 5
+            regex = 'my-regex'
+
+        kwargs = {'foo': 'bar', 'validators': ['test']}
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs(DocumentFieldMock(), kwargs)
+
+        self.assertEqual({
+            'foo': 'bar',
+            'validators': ['test', 'length-validator', 'regexp-validator'],
+        }, kwargs)
+        validators.Length.assert_called_once_with(max=10, min=5)
+        validators.Regexp.assert_called_once_with(regex='my-regex')
+
+    @patch('wtfmongoengine.forms.validators')
+    def test_common_string_kwargs_max_length_min_one(self, validators):
+        """
+        Test that when there is no ``max_length``, it is set to ``-1``.
+
+        Tests :py:meth:`.DocumentFieldConverter.set_common_string_kwargs`.
+        """
+        document_field = Mock()
+        document_field.max_length = None
+        document_field.min_length = 10
+
+        kwargs = {'validators': []}
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs(document_field, kwargs)
+
+        validators.Length.assert_called_once_with(max=-1, min=10)
+
+    @patch('wtfmongoengine.forms.validators')
+    def test_common_string_kwargs_min_length_min_one(self, validators):
+        """
+        Test that when there is no ``min_length``, it is set to ``-1``.
+
+        Tests :py:meth:`.DocumentFieldConverter.set_common_string_kwargs`.
+        """
+        document_field = Mock()
+        document_field.max_length = 10
+        document_field.min_length = None
+
+        kwargs = {'validators': []}
+
+        converter = DocumentFieldConverter()
+        converter.set_common_string_kwargs(document_field, kwargs)
+
+        validators.Length.assert_called_once_with(max=10, min=-1)
+
+    def test_from_stringfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_stringfield`.
+        """
+        pass
+
+    def test_from_urlfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_urlfield`.
+        """
+        pass
+
+    def test_from_emailfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_emailfield`.
+        """
+        pass
+
+    def test_from_intfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_intfield`.
+        """
+        pass
+
+    def test_from_floatfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_floatfield`.
+        """
+        pass
+
+    def test_from_decimalfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_decimalfield`.
+        """
+        pass

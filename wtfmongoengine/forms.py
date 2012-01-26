@@ -37,6 +37,43 @@ class DocumentFieldConverter(object):
         else:
             return None
 
+    def set_common_string_kwargs(self, document_field, kwargs):
+        """
+        Set commong string arguments.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :param kwargs:
+            A ``dict`` that needs to be updated with the new arguments.
+
+        """
+        if document_field.max_length or document_field.min_length:
+            kwargs['validators'].append(
+                validators.Length(
+                    max=document_field.max_length or -1,
+                    min=document_field.min_length or -1
+                )
+            )
+
+        if document_field.regex:
+            kwargs['validators'].append(
+                validators.Regexp(regex=document_field.regex)
+            )
+
+    def from_stringfield(self, document_field, **kwargs):
+        """
+        Convert ``document_field`` into a ``TextField``.
+
+        :param document_field:
+            Instance of Mongoengine field.
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.TextField`.
+
+        """
+        pass
+
 
 class DocumentFormMetaClassBase(type):
     """
