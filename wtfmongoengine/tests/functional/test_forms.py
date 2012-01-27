@@ -60,6 +60,11 @@ class DocumentFormTestCase(unittest.TestCase):
                 help_text='Fill in a datetime',
             )
 
+            boolean_field = fields.BooleanField(
+                verbose_name='A bool',
+                help_text='Yes or no?',
+            )
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -160,3 +165,13 @@ class DocumentFormTestCase(unittest.TestCase):
         self.assertEqual(field.field_class, wtfields.DateTimeField)
         self.assertEqual('A datetime', field.kwargs['label'])
         self.assertEqual('Fill in a datetime', field.kwargs['description'])
+
+    def test_booleanfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_booleanfield`.
+        """
+        field = self.test_form.boolean_field
+
+        self.assertEqual(field.field_class, wtfields.BooleanField)
+        self.assertEqual('A bool', field.kwargs['label'])
+        self.assertEqual('Yes or no?', field.kwargs['description'])
