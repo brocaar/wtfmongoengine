@@ -55,6 +55,11 @@ class DocumentFormTestCase(unittest.TestCase):
                 help_text='Fill in a decimal',
             )
 
+            datetime_field = fields.DateTimeField(
+                verbose_name='A datetime',
+                help_text='Fill in a datetime',
+            )
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -145,3 +150,13 @@ class DocumentFormTestCase(unittest.TestCase):
             field.kwargs['validators'][0], validators.NumberRange)
         self.assertEqual(3, field.kwargs['validators'][0].min)
         self.assertEqual(104, field.kwargs['validators'][0].max)
+
+    def test_datetimefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_datetimefield`.
+        """
+        field = self.test_form.datetime_field
+
+        self.assertEqual(field.field_class, wtfields.DateTimeField)
+        self.assertEqual('A datetime', field.kwargs['label'])
+        self.assertEqual('Fill in a datetime', field.kwargs['description'])
