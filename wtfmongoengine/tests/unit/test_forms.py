@@ -116,10 +116,11 @@ class DocumentFieldConverterTestCase(TestCase):
         validators.Required.return_value = 'required'
 
         class DocumentFieldMock(object):
-            name = 'test field'
+            verbose_name = 'test field'
             required = True
             default = 'empty'
             choices = None
+            help_text = 'This is a field for testing purpose'
 
         document_field = DocumentFieldMock()
 
@@ -133,6 +134,7 @@ class DocumentFieldConverterTestCase(TestCase):
             label='test field',
             validators=['required'],
             default='empty',
+            description='This is a field for testing purpose'
         )
 
         self.assertEqual('wtfield', result)
@@ -147,10 +149,11 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.SelectField.return_value = 'select-field'
 
         class DocumentFieldMock(object):
-            name = 'test field'
+            verbose_name = 'test field'
             required = False
             default = 'empty'
             choices = [('a', 'Choice A'), ('b', 'Choice B')]
+            help_text = 'Make your choice'
 
         converter = DocumentFieldConverter()
 
@@ -160,7 +163,8 @@ class DocumentFieldConverterTestCase(TestCase):
             label='test field',
             validators=[],
             default='empty',
-            choices=[('a', 'Choice A'), ('b', 'Choice B')]
+            choices=[('a', 'Choice A'), ('b', 'Choice B')],
+            description='Make your choice'
         )
 
         self.assertEqual('select-field', result)
@@ -174,10 +178,11 @@ class DocumentFieldConverterTestCase(TestCase):
         Tests :py:meth:`.DocumentFieldConverter.convert`.
         """
         class DocumentFieldMock(object):
-            name = 'test field'
+            verbose_name = 'test field'
             required = False
             default = ''
             choices = []
+            help_text = ''
 
         converter = DocumentFieldConverter()
         result = converter.convert(DocumentFieldMock())

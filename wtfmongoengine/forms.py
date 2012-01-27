@@ -16,7 +16,8 @@ class DocumentFieldConverter(object):
 
         """
         kwargs = {
-            'label': document_field.name,
+            'label': document_field.verbose_name or document_field.name,
+            'description': document_field.help_text or '',
             'validators': [],
             'default': document_field.default,
         }

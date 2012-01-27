@@ -14,18 +14,23 @@ class DocumentFormTestCase(unittest.TestCase):
     def setUp(self):
         class TestDocument(Document):
             string_field = fields.StringField(
+                verbose_name='A string',
                 regex=r'[\w]+',
                 max_length=100,
                 min_length=10,
             )
 
-            url_field = fields.URLField()
+            url_field = fields.URLField(verbose_name='An URL')
 
             email_field = fields.EmailField(
+                verbose_name='An e-mail address',
                 regex=r'.*',
                 max_length=101,
                 min_length=11,
             )
+
+            int_field = fields.IntField(
+                verbose_name='An int', min_value=1, max_value=102)
 
         class TestForm(DocumentForm):
             class Meta:
@@ -41,6 +46,9 @@ class DocumentFormTestCase(unittest.TestCase):
             self.test_form.string_field.field_class,
             wtfields.TextField
         )
+
+        self.assertEqual(
+            'A string', self.test_form.string_field.kwargs['label'])
 
         self.assertIsInstance(
             self.test_form.string_field.kwargs['validators'][0],
@@ -72,6 +80,9 @@ class DocumentFormTestCase(unittest.TestCase):
             wtfields.TextField
         )
 
+        self.assertEqual(
+            'An URL', self.test_form.url_field.kwargs['label'])
+
         self.assertIsInstance(
             self.test_form.url_field.kwargs['validators'][0],
             validators.URL
@@ -85,6 +96,9 @@ class DocumentFormTestCase(unittest.TestCase):
             self.test_form.email_field.field_class,
             wtfields.TextField
         )
+
+        self.assertEqual(
+            'An e-mail address', self.test_form.email_field.kwargs['label'])
 
         self.assertIsInstance(
             self.test_form.email_field.kwargs['validators'][0],
@@ -111,3 +125,26 @@ class DocumentFormTestCase(unittest.TestCase):
             r'.*',
             self.test_form.email_field.kwargs['validators'][2].regex.pattern
         )
+
+    def test_intfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_intfield`.
+        """
+        self.assertEqual(
+            self.test_form.int_field.field_class,
+            wtfields.IntegerField
+        )
+
+        self.assertEqual(
+            'An int', self.test_form.int_field.kwargs['label'])
+
+        self.assertIsInstance(
+            self.test_form.int_field.kwargs['validators'][0],
+            validators.NumberRange
+        )
+
+        self.assertEqual(
+            1, self.test_form.int_field.kwargs['validators'][0].min)
+
+        self.assertEqual(
+            102, self.test_form.int_field.kwargs['validators'][0].max)
