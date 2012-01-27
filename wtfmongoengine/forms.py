@@ -167,7 +167,16 @@ class DocumentFieldConverter(object):
         return fields.DecimalField(**kwargs)
 
     def from_datetimefield(self, document_field, **kwargs):
-        return None
+        """
+        Convert ``document_field`` into a ``DateTimeField``.
+
+        :param document_field:
+
+        :return:
+            Instance of :py:class:`!wtforms.fields.DateTimeField`.
+
+        """
+        return fields.DateTimeField(**kwargs)
 
     def from_complexdatetimefield(self, document_field, **kwargs):
         return None
@@ -222,7 +231,7 @@ class DocumentFieldConverter(object):
         return None
 
     def from_sequencefield(self, document_field, **kwargs):
-        pass
+        return None
 
 
 class DocumentFormMetaClassBase(type):

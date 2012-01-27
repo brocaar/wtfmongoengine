@@ -387,3 +387,17 @@ class DocumentFieldConverterTestCase(TestCase):
 
         fields.BooleanField.assert_called_once_with(validators=[])
         self.assertEqual('boolean-field', result)
+
+    @patch('wtfmongoengine.forms.fields')
+    def test_from_datetimefield(self, fields):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_datetimefield`.
+        """
+        fields.DateTimeField.return_value = 'datetime-field'
+        document_field = Mock()
+
+        converter = DocumentFieldConverter()
+        result = converter.from_datetimefield(document_field, validators=[])
+
+        fields.DateTimeField.assert_called_once_with(validators=[])
+        self.assertEqual('datetime-field', result)
