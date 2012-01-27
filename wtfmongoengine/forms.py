@@ -106,6 +106,7 @@ class DocumentFieldConverter(object):
 
         """
         kwargs['validators'].append(validators.URL())
+        # TODO: cleanyp set_common_string_kwargs?
         self.set_common_string_kwargs(document_field, kwargs)
         return fields.TextField(**kwargs)
 

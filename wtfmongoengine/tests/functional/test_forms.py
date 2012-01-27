@@ -21,6 +21,12 @@ class DocumentFormTestCase(unittest.TestCase):
 
             url_field = fields.URLField()
 
+            email_field = fields.EmailField(
+                regex=r'.*',
+                max_length=101,
+                min_length=11,
+            )
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -69,4 +75,39 @@ class DocumentFormTestCase(unittest.TestCase):
         self.assertIsInstance(
             self.test_form.url_field.kwargs['validators'][0],
             validators.URL
+        )
+
+    def test_emailfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_emailfield`.
+        """
+        self.assertEqual(
+            self.test_form.email_field.field_class,
+            wtfields.TextField
+        )
+
+        self.assertIsInstance(
+            self.test_form.email_field.kwargs['validators'][0],
+            validators.Email
+        )
+
+        self.assertIsInstance(
+            self.test_form.email_field.kwargs['validators'][1],
+            validators.Length
+        )
+
+        self.assertIsInstance(
+            self.test_form.email_field.kwargs['validators'][2],
+            validators.Regexp
+        )
+
+        self.assertEqual(
+            101, self.test_form.email_field.kwargs['validators'][1].max)
+
+        self.assertEqual(
+            11, self.test_form.email_field.kwargs['validators'][1].min)
+
+        self.assertEqual(
+            r'.*',
+            self.test_form.email_field.kwargs['validators'][2].regex.pattern
         )
