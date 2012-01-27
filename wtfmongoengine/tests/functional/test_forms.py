@@ -19,6 +19,8 @@ class DocumentFormTestCase(unittest.TestCase):
                 min_length=10,
             )
 
+            url_field = fields.URLField()
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -53,4 +55,18 @@ class DocumentFormTestCase(unittest.TestCase):
         self.assertEqual(
             r'[\w]+',
             self.test_form.string_field.kwargs['validators'][1].regex.pattern
+        )
+
+    def test_urlfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_urlfield`.
+        """
+        self.assertEqual(
+            self.test_form.url_field.field_class,
+            wtfields.TextField
+        )
+
+        self.assertIsInstance(
+            self.test_form.url_field.kwargs['validators'][0],
+            validators.URL
         )
