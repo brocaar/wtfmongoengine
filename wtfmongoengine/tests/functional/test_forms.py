@@ -18,19 +18,28 @@ class DocumentFormTestCase(unittest.TestCase):
                 regex=r'[\w]+',
                 max_length=100,
                 min_length=10,
+                help_text='Fill in a string',
             )
 
-            url_field = fields.URLField(verbose_name='An URL')
+            url_field = fields.URLField(
+                verbose_name='An URL',
+                help_text='Fill in an URL',
+            )
 
             email_field = fields.EmailField(
                 verbose_name='An e-mail address',
                 regex=r'.*',
                 max_length=101,
                 min_length=11,
+                help_text='Fill in an e-mail address',
             )
 
             int_field = fields.IntField(
-                verbose_name='An int', min_value=1, max_value=102)
+                verbose_name='An int',
+                min_value=1,
+                max_value=102,
+                help_text='Fill in an int',
+            )
 
         class TestForm(DocumentForm):
             class Meta:
@@ -42,109 +51,55 @@ class DocumentFormTestCase(unittest.TestCase):
         """
         Test :py:meth:`.DocumentFieldConverter.from_stringfield`.
         """
-        self.assertEqual(
-            self.test_form.string_field.field_class,
-            wtfields.TextField
-        )
+        field = self.test_form.string_field
 
-        self.assertEqual(
-            'A string', self.test_form.string_field.kwargs['label'])
-
-        self.assertIsInstance(
-            self.test_form.string_field.kwargs['validators'][0],
-            validators.Length
-        )
-
-        self.assertIsInstance(
-            self.test_form.string_field.kwargs['validators'][1],
-            validators.Regexp
-        )
-
-        self.assertEqual(
-            100, self.test_form.string_field.kwargs['validators'][0].max)
-
-        self.assertEqual(
-            10, self.test_form.string_field.kwargs['validators'][0].min)
-
-        self.assertEqual(
-            r'[\w]+',
-            self.test_form.string_field.kwargs['validators'][1].regex.pattern
-        )
+        self.assertEqual(field.field_class, wtfields.TextField)
+        self.assertEqual('A string', field.kwargs['label'])
+        self.assertEqual('Fill in a string', field.kwargs['description'])
+        self.assertIsInstance(field.kwargs['validators'][0], validators.Length)
+        self.assertIsInstance(field.kwargs['validators'][1], validators.Regexp)
+        self.assertEqual(100, field.kwargs['validators'][0].max)
+        self.assertEqual(10, field.kwargs['validators'][0].min)
+        self.assertEqual(r'[\w]+', field.kwargs['validators'][1].regex.pattern)
 
     def test_urlfield(self):
         """
         Test :py:meth:`.DocumentFieldConverter.from_urlfield`.
         """
-        self.assertEqual(
-            self.test_form.url_field.field_class,
-            wtfields.TextField
-        )
+        field = self.test_form.url_field
 
-        self.assertEqual(
-            'An URL', self.test_form.url_field.kwargs['label'])
-
-        self.assertIsInstance(
-            self.test_form.url_field.kwargs['validators'][0],
-            validators.URL
-        )
+        self.assertEqual(field.field_class, wtfields.TextField)
+        self.assertEqual('An URL', field.kwargs['label'])
+        self.assertEqual('Fill in an URL', field.kwargs['description'])
+        self.assertIsInstance(field.kwargs['validators'][0], validators.URL)
 
     def test_emailfield(self):
         """
         Test :py:meth:`.DocumentFieldConverter.from_emailfield`.
         """
+        field = self.test_form.email_field
+
+        self.assertEqual(field.field_class, wtfields.TextField)
+        self.assertEqual('An e-mail address', field.kwargs['label'])
         self.assertEqual(
-            self.test_form.email_field.field_class,
-            wtfields.TextField
-        )
-
-        self.assertEqual(
-            'An e-mail address', self.test_form.email_field.kwargs['label'])
-
-        self.assertIsInstance(
-            self.test_form.email_field.kwargs['validators'][0],
-            validators.Email
-        )
-
-        self.assertIsInstance(
-            self.test_form.email_field.kwargs['validators'][1],
-            validators.Length
-        )
-
-        self.assertIsInstance(
-            self.test_form.email_field.kwargs['validators'][2],
-            validators.Regexp
-        )
-
-        self.assertEqual(
-            101, self.test_form.email_field.kwargs['validators'][1].max)
-
-        self.assertEqual(
-            11, self.test_form.email_field.kwargs['validators'][1].min)
-
-        self.assertEqual(
-            r'.*',
-            self.test_form.email_field.kwargs['validators'][2].regex.pattern
-        )
+            'Fill in an e-mail address', field.kwargs['description'])
+        self.assertIsInstance(field.kwargs['validators'][0], validators.Email)
+        self.assertIsInstance(field.kwargs['validators'][1], validators.Length)
+        self.assertIsInstance(field.kwargs['validators'][2], validators.Regexp)
+        self.assertEqual(101, field.kwargs['validators'][1].max)
+        self.assertEqual(11, field.kwargs['validators'][1].min)
+        self.assertEqual(r'.*', field.kwargs['validators'][2].regex.pattern)
 
     def test_intfield(self):
         """
         Test :py:meth:`.DocumentFieldConverter.from_intfield`.
         """
-        self.assertEqual(
-            self.test_form.int_field.field_class,
-            wtfields.IntegerField
-        )
+        field = self.test_form.int_field
 
-        self.assertEqual(
-            'An int', self.test_form.int_field.kwargs['label'])
-
+        self.assertEqual(field.field_class, wtfields.IntegerField)
+        self.assertEqual('An int', field.kwargs['label'])
+        self.assertEqual('Fill in an int', field.kwargs['description'])
         self.assertIsInstance(
-            self.test_form.int_field.kwargs['validators'][0],
-            validators.NumberRange
-        )
-
-        self.assertEqual(
-            1, self.test_form.int_field.kwargs['validators'][0].min)
-
-        self.assertEqual(
-            102, self.test_form.int_field.kwargs['validators'][0].max)
+            field.kwargs['validators'][0], validators.NumberRange)
+        self.assertEqual(1, field.kwargs['validators'][0].min)
+        self.assertEqual(102, field.kwargs['validators'][0].max)
