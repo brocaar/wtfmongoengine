@@ -48,6 +48,13 @@ class DocumentFormTestCase(unittest.TestCase):
                 help_text='Fill in a float',
             )
 
+            decimal_field = fields.DecimalField(
+                verbose_name='A decimal',
+                min_value=3,
+                max_value=104,
+                help_text='Fill in a decimal',
+            )
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -124,3 +131,17 @@ class DocumentFormTestCase(unittest.TestCase):
             field.kwargs['validators'][0], validators.NumberRange)
         self.assertEqual(2, field.kwargs['validators'][0].min)
         self.assertEqual(103, field.kwargs['validators'][0].max)
+
+    def test_decimalfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_decimalfield`.
+        """
+        field = self.test_form.decimal_field
+
+        self.assertEqual(field.field_class, wtfields.DecimalField)
+        self.assertEqual('A decimal', field.kwargs['label'])
+        self.assertEqual('Fill in a decimal', field.kwargs['description'])
+        self.assertIsInstance(
+            field.kwargs['validators'][0], validators.NumberRange)
+        self.assertEqual(3, field.kwargs['validators'][0].min)
+        self.assertEqual(104, field.kwargs['validators'][0].max)
