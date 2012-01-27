@@ -41,6 +41,13 @@ class DocumentFormTestCase(unittest.TestCase):
                 help_text='Fill in an int',
             )
 
+            float_field = fields.FloatField(
+                verbose_name='A float',
+                min_value=2,
+                max_value=103,
+                help_text='Fill in a float',
+            )
+
         class TestForm(DocumentForm):
             class Meta:
                 document = TestDocument
@@ -103,3 +110,17 @@ class DocumentFormTestCase(unittest.TestCase):
             field.kwargs['validators'][0], validators.NumberRange)
         self.assertEqual(1, field.kwargs['validators'][0].min)
         self.assertEqual(102, field.kwargs['validators'][0].max)
+
+    def test_floatfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_floatfield`.
+        """
+        field = self.test_form.float_field
+
+        self.assertEqual(field.field_class, wtfields.FloatField)
+        self.assertEqual('A float', field.kwargs['label'])
+        self.assertEqual('Fill in a float', field.kwargs['description'])
+        self.assertIsInstance(
+            field.kwargs['validators'][0], validators.NumberRange)
+        self.assertEqual(2, field.kwargs['validators'][0].min)
+        self.assertEqual(103, field.kwargs['validators'][0].max)
