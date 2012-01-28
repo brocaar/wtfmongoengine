@@ -3,6 +3,56 @@ from wtforms.form import Form, FormMeta
 
 
 class DocumentFieldConverter(object):
+    """
+    Convert the given ``document`` into WTForm fields.
+
+    :param document:
+        The Mongoengine document to convert.
+
+    :param fields:
+        If given, it will only parse these fields. (optional)
+
+    :param exclude:
+        If given, it will exclude these fields from parsing. (optional)
+
+    """
+
+    def __init__(self, document, fields=None, exclude=None):
+        self.document = document
+        self.only_fields = fields
+        self.exclude_fields = exclude
+
+    @property
+    def fields(self):
+        """
+        Return a ``dict`` containing the WTForms fields.
+
+        :return:
+            A ``dict`` with the following as key / value:
+
+            key
+                The (internal) field name.
+
+            value
+                An object representing the WTForms field.
+
+        """
+        field_dict = {}
+        field_names = self.document._fields.keys()
+
+        if self.only_fields:
+            field_names = (f for f in field_names if f in self.only_fields)
+        elif self.exclude_fields:
+            field_names = (
+                f for f in field_names if f not in self.exclude_fields)
+
+        for field_name in field_names:
+            model_field = self.document._fields[field_name]
+            wtf_field = self.convert(model_field)
+            if wtf_field:
+                field_dict[field_name] = wtf_field
+
+        return field_dict
 
     def convert(self, document_field):
         """
@@ -246,44 +296,11 @@ class DocumentFormMetaClassBase(type):
             fields = getattr(attrs['Meta'], 'fields', None)
             exclude = getattr(attrs['Meta'], 'exclude', None)
 
-            attrs = DocumentFormMetaClassBase.model_fields(
-                document, fields, exclude)
+            converter = DocumentFieldConverter(document, fields, exclude)
+            attrs = converter.fields
 
         return super(
             DocumentFormMetaClassBase, cls).__new__(cls, name, bases, attrs)
-
-    @classmethod
-    def model_fields(cls, document, fields=None, exclude=None):
-        """
-        Convert the given document into a WTForm fields.
-
-        :param document:
-            The Mongoengine document to convert.
-
-        :param fields:
-            If given, it will only parse these fields.
-
-        :param exclude:
-            If given, it will exclude these fields from parsing.
-
-        """
-        field_names = document._fields.keys()
-
-        if fields:
-            field_names = (f for f in field_names if f in fields)
-        elif exclude:
-            field_names = (f for f in field_names if f not in exclude)
-
-        converter = DocumentFieldConverter()
-        field_dict = {}
-
-        for field_name in field_names:
-            model_field = document._fields[field_name]
-            wtf_field = converter.convert(model_field)
-            if wtf_field:
-                field_dict[field_name] = wtf_field
-
-        return field_dict
 
 
 class DocumentFormMetaClass(DocumentFormMetaClassBase, FormMeta):

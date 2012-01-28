@@ -10,6 +10,39 @@ class DocumentFormMetaClassBaseTestCase(TestCase):
     """
     Test :py:class:`.DocumentFormMetaClassBase`.
     """
+    @patch('wtfmongoengine.forms.DocumentFieldConverter')
+    def test___new__(self, DocumentFieldConverter):
+        """
+        Test that ``__new__`` is creating the new class properly.
+        """
+        converter = Mock()
+        converter.fields = {
+            'field_a': 'a-value',
+            'field_b': 'b-value'
+        }
+        DocumentFieldConverter.return_value = converter
+
+        class TestClass(object):
+            __metaclass__ = DocumentFormMetaClassBase
+
+            class Meta:
+                fields = ('title', 'body',)
+                exclude = ('author', 'timestamp',)
+                document = 'a-document'
+
+        DocumentFieldConverter.assert_called_once_with(
+            'a-document',
+            ('title', 'body',),
+            ('author', 'timestamp',),
+        )
+        self.assertEqual('a-value', TestClass.field_a)
+        self.assertEqual('b-value', TestClass.field_b)
+
+
+class DocumentFieldConverterTestCase(TestCase):
+    """
+    Test :py:class:`.DocumentFieldConverter`.
+    """
     def setUp(self):
         self.fields = {
             'title': Mock(return_value='title-value'),
@@ -21,91 +54,74 @@ class DocumentFormMetaClassBaseTestCase(TestCase):
         self.document = Mock()
         self.document._fields = self.fields
 
-        self.converter = Mock()
-        self.converter.convert.side_effect = lambda x: x()
+        self.convert = Mock()
+        self.convert.side_effect = lambda x: x()
 
-    @patch('wtfmongoengine.forms.DocumentFormMetaClassBase.model_fields')
-    def test___new__(self, model_fields):
+    def test___init__(self):
         """
-        Test that ``__new__`` is creating the new class properly.
+        Test ``__init__`` of :py:class:`.DocumentFieldConverter`.
         """
-        model_fields.return_value = {
-            'field_a': 'a-value',
-            'field_b': 'b-value'
-        }
+        converter = DocumentFieldConverter(self.document)
 
-        class TestClass(object):
-            __metaclass__ = DocumentFormMetaClassBase
+        self.assertEqual(self.document, converter.document)
+        self.assertEqual(None, converter.only_fields)
+        self.assertEqual(None, converter.exclude_fields)
 
-            class Meta:
-                fields = ('title', 'body',)
-                exclude = ('author', 'timestamp',)
-                document = 'a-document'
+    def test__init__with_fields_exclude(self):
+        """
+        Test ``__init__`` with extra ``fields`` and ``exclude`` arguments.
+        """
+        converter = DocumentFieldConverter(
+            self.document, fields='fields', exclude='exclude')
 
-        model_fields.assert_called_once_with(
-            'a-document',
-            ('title', 'body',),
-            ('author', 'timestamp',),
+        self.assertEqual(self.document, converter.document)
+        self.assertEqual('fields', converter.only_fields)
+        self.assertEqual('exclude', converter.exclude_fields)
+
+    def test_fields(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.fields`.
+        """
+        converter = DocumentFieldConverter(self.document)
+        converter.convert = self.convert
+
+        self.assertEqual({
+            'title': 'title-value',
+            'body': 'body-value',
+            'author': 'author-value',
+            'timestamp': 'timestamp-value',
+        }, converter.fields)
+
+    def test_fields_only_fields(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.fields` with only fields.
+        """
+        converter = DocumentFieldConverter(
+            self.document,
+            fields=['title', 'author']
         )
-        self.assertEqual('a-value', TestClass.field_a)
-        self.assertEqual('b-value', TestClass.field_b)
-
-    @patch('wtfmongoengine.forms.DocumentFieldConverter')
-    def test_model_fields(self, DocumentFieldConverter):
-        """
-        Test that ``model_fields`` extracts the fields.
-
-        Tests :py:meth:`.DocumentFormMetaClassBase.model_fields`.
-        """
-        DocumentFieldConverter.return_value = self.converter
-
-        result = DocumentFormMetaClassBase.model_fields(self.document)
-        self.assertEqual({
-            'title': 'title-value',
-            'body': 'body-value',
-            'author': 'author-value',
-            'timestamp': 'timestamp-value',
-        }, result)
-
-    @patch('wtfmongoengine.forms.DocumentFieldConverter')
-    def test_model_fields_fields(self, DocumentFieldConverter):
-        """
-        Test that ``model_fields`` uses only fields in ``fields`` argument.
-
-        Tests :py:meth:`.DocumentFormMetaClassBase.model_fields`.
-        """
-        DocumentFieldConverter.return_value = self.converter
-
-        result = DocumentFormMetaClassBase.model_fields(
-            self.document, fields=('title', 'author',))
+        converter.convert = self.convert
 
         self.assertEqual({
             'title': 'title-value',
             'author': 'author-value',
-        }, result)
+        }, converter.fields)
 
-    @patch('wtfmongoengine.forms.DocumentFieldConverter')
-    def test_model_fields_exclude(self, DocumentFieldConverter):
+    def test_fields_exclude_fields(self):
         """
-        Test that ``model_fields`` excludes fields in ``exclude`` argument.
-
-        Tests :py:meth:`.DocumentFormMetaClassBase.model_fields`.
+        Test :py:meth:`.DocumentFieldConverter.fields` with excluded fields.
         """
-        DocumentFieldConverter.return_value = self.converter
-
-        result = DocumentFormMetaClassBase.model_fields(
-            self.document, exclude=('title', 'author',))
+        converter = DocumentFieldConverter(
+            self.document,
+            exclude=['body', 'author']
+        )
+        converter.convert = self.convert
 
         self.assertEqual({
-            'body': 'body-value',
+            'title': 'title-value',
             'timestamp': 'timestamp-value',
-        }, result)
+        }, converter.fields)
 
-
-class DocumentFieldConverterTestCase(TestCase):
-    """
-    Test :py:class:`.DocumentFieldConverter`.
-    """
     @patch('wtfmongoengine.forms.validators')
     def test_convert(self, validators):
         """
@@ -124,7 +140,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         document_field = DocumentFieldMock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.from_documentfieldmock = Mock(return_value='wtfield')
 
         result = converter.convert(document_field)
@@ -155,7 +171,7 @@ class DocumentFieldConverterTestCase(TestCase):
             choices = [('a', 'Choice A'), ('b', 'Choice B')]
             help_text = 'Make your choice'
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
 
         result = converter.convert(DocumentFieldMock())
 
@@ -184,7 +200,7 @@ class DocumentFieldConverterTestCase(TestCase):
             choices = []
             help_text = ''
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         result = converter.convert(DocumentFieldMock())
         self.assertEqual(None, result)
 
@@ -205,7 +221,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         kwargs = {'foo': 'bar', 'validators': ['test']}
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs(DocumentFieldMock(), kwargs)
 
         self.assertEqual({
@@ -228,7 +244,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         kwargs = {'validators': []}
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs(document_field, kwargs)
 
         validators.Length.assert_called_once_with(max=-1, min=10)
@@ -246,7 +262,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         kwargs = {'validators': []}
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs(document_field, kwargs)
 
         validators.Length.assert_called_once_with(max=10, min=-1)
@@ -264,7 +280,7 @@ class DocumentFieldConverterTestCase(TestCase):
 
         kwargs = {'validators': []}
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock(Mock()))
         converter.set_common_number_kwargs(document_field, kwargs)
 
         validators.NumberRange.assert_called_once_with(max=20, min=10)
@@ -278,7 +294,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.TextField.return_value = 'text-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs = Mock()
         result = converter.from_stringfield(document_field, foo='bar')
 
@@ -298,7 +314,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.TextField.return_value = 'text-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs = Mock()
         result = converter.from_urlfield(document_field, validators=[])
 
@@ -318,7 +334,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.TextField.return_value = 'text-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_string_kwargs = Mock()
         result = converter.from_emailfield(document_field, validators=[])
 
@@ -336,7 +352,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.IntegerField.return_value = 'integer-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_number_kwargs = Mock()
         result = converter.from_intfield(document_field, validators=[])
 
@@ -353,7 +369,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.FloatField.return_value = 'float-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_number_kwargs = Mock()
         result = converter.from_floatfield(document_field, validators=[])
 
@@ -370,7 +386,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.DecimalField.return_value = 'decimal-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         converter.set_common_number_kwargs = Mock()
         result = converter.from_decimalfield(document_field, validators=[])
 
@@ -387,7 +403,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.BooleanField.return_value = 'boolean-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         result = converter.from_booleanfield(document_field, validators=[])
 
         fields.BooleanField.assert_called_once_with(validators=[])
@@ -401,7 +417,7 @@ class DocumentFieldConverterTestCase(TestCase):
         fields.DateTimeField.return_value = 'datetime-field'
         document_field = Mock()
 
-        converter = DocumentFieldConverter()
+        converter = DocumentFieldConverter(Mock())
         result = converter.from_datetimefield(document_field, validators=[])
 
         fields.DateTimeField.assert_called_once_with(validators=[])
