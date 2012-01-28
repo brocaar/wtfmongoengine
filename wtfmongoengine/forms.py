@@ -10,10 +10,13 @@ class DocumentFieldConverter(object):
         The Mongoengine document to convert.
 
     :param fields:
-        If given, it will only parse these fields. (optional)
+        A ``tuple`` of fields to include (optional).
 
     :param exclude:
-        If given, it will exclude these fields from parsing. (optional)
+        A ``tuple`` of fields to exclude (optional).
+
+    .. note::
+        When both using ``fields`` and ``exclude``, ``fields`` will be used.
 
     """
 
@@ -312,5 +315,30 @@ class DocumentFormMetaClass(DocumentFormMetaClassBase, FormMeta):
 class DocumentForm(Form):
     """
     Baseclass for constructing a WTF form from a Mongoengine Document class.
+
+    Usage example::
+
+        from mongoengine import document, fields
+        from wtfmongoengine.forms import DocumentForm
+
+        class User(document.Document):
+            email = fields.StringField(required=True)
+            first_name = fields.StringField(max_length=50)
+            last_name = fields.StringField(max_length=50)
+
+        class UserForm(DocumentForm):
+            class Meta:
+                document = User
+
+                # In case you only want to include ``first_name`` in the form
+                # fields = ('first_name',)
+
+                # In case you want to exclude ``email`` from the form
+                # exclude = ('email',)
+
+    .. note::
+        When using both ``fields`` and ``exclude``, only ``fields`` will
+        be used.
+
     """
     __metaclass__ = DocumentFormMetaClass
