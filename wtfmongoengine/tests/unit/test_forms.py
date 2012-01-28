@@ -422,3 +422,120 @@ class DocumentFieldConverterTestCase(TestCase):
 
         fields.DateTimeField.assert_called_once_with(validators=[])
         self.assertEqual('datetime-field', result)
+
+    def test_from_complexdatetimefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_complexdatetimefield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_complexdatetimefield, Mock())
+
+    def test_from_listfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_listfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_listfield, Mock())
+
+    def test_from_sortedlistfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_sortedlistfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_sortedlistfield, Mock())
+
+    def test_from_dictfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_dictfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_dictfield, Mock())
+
+    def test_from_mapfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_mapfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_mapfield, Mock())
+
+    def test_from_objectidfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_objectidfield`.
+
+        This tests that this method returns ``None``.
+
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertEqual(None, converter.from_objectidfield(Mock()))
+
+    def test_from_referencefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_referencefield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_referencefield, Mock())
+
+    def test_from_genericreferencefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_genericreferencefield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_genericreferencefield, Mock())
+
+    def test_from_embeddeddocumentfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_embeddeddocumentfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_embeddeddocumentfield, Mock())
+
+    def test_from_genericembeddeddocumentfield(self):
+        """
+        Test :meth:`.DocumentFieldConverter.from_genericembeddeddocumentfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError,
+            converter.from_genericembeddeddocumentfield,
+            Mock()
+        )
+
+    def test_from_filefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_filefield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_filefield, Mock())
+
+    def test_from_binaryfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_binaryfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_binaryfield, Mock())
+
+    def test_from_geopointfield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_geopointfield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_geopointfield, Mock())
+
+    def test_from_sequencefield(self):
+        """
+        Test :py:meth:`.DocumentFieldConverter.from_sequencefield`.
+        """
+        converter = DocumentFieldConverter(Mock())
+        self.assertRaises(
+            NotImplementedError, converter.from_sequencefield, Mock())

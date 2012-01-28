@@ -231,34 +231,35 @@ class DocumentFieldConverter(object):
         return fields.DateTimeField(**kwargs)
 
     def from_complexdatetimefield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('ComplexDateTimeField not implemented.')
 
     def from_listfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('ListField not implemented.')
 
     def from_sortedlistfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('SortedListField not implemented.')
 
     def from_dictfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('DictField not implemented.')
 
     def from_mapfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('MapField not implemented.')
 
     def from_objectidfield(self, document_field, **kwargs):
         return None
 
     def from_referencefield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('ReferenceField not implemented.')
 
     def from_genericreferencefield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('GenericReferenceField not implemented.')
 
     def from_embeddeddocumentfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('EmbeddedDocumentField not implemented.')
 
     def from_genericembeddeddocumentfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError(
+            'GenericEmbeddedDocumentField not implemented.')
 
     def from_booleanfield(self, document_field, **kwargs):
         """
@@ -274,16 +275,16 @@ class DocumentFieldConverter(object):
         return fields.BooleanField(**kwargs)
 
     def from_filefield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('FileField not implemented.')
 
     def from_binaryfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('BinaryField not implemented.')
 
     def from_geopointfield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('GeoPointField not implemented.')
 
     def from_sequencefield(self, document_field, **kwargs):
-        return None
+        raise NotImplementedError('SequenceField not implemented.')
 
 
 class DocumentFormMetaClassBase(type):
