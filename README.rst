@@ -1,7 +1,7 @@
-WTForms-Mongoengine
-===================
+WTFMongoengine
+==============
 
-**WTForms-Mongoengine** creates WTForms ``Form`` classes from Mongoengine
+**WTFMongoengine** creates WTForms ``Form`` classes from Mongoengine
 ``Document`` objects. Example::
 
     from mongoengine import document, fields
