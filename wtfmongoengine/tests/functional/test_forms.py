@@ -1,10 +1,10 @@
-import unittest
+import unittest2 as unittest
 
 from mongoengine.document import Document
 from mongoengine import fields
 from wtforms import validators, fields as wtfields
 
-from wtfmongoengine.forms import DocumentForm, DocumentFieldConverter
+from wtfmongoengine.forms import DocumentForm
 
 
 class DocumentFormTestCase(unittest.TestCase):
