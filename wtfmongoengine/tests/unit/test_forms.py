@@ -28,7 +28,7 @@ class DocumentFormMetaClassBaseTestCase(TestCase):
             class Meta:
                 fields = ('title', 'body',)
                 exclude = ('author', 'timestamp',)
-                document = 'a-document'
+                document_class = 'a-document'
 
         DocumentFieldConverter.assert_called_once_with(
             'a-document',
@@ -51,8 +51,8 @@ class DocumentFieldConverterTestCase(TestCase):
             'timestamp': Mock(return_value='timestamp-value'),
         }
 
-        self.document = Mock()
-        self.document._fields = self.fields
+        self.document_class = Mock()
+        self.document_class._fields = self.fields
 
         self.convert = Mock()
         self.convert.side_effect = lambda x: x()
@@ -61,9 +61,9 @@ class DocumentFieldConverterTestCase(TestCase):
         """
         Test ``__init__`` of :py:class:`.DocumentFieldConverter`.
         """
-        converter = DocumentFieldConverter(self.document)
+        converter = DocumentFieldConverter(self.document_class)
 
-        self.assertEqual(self.document, converter.document)
+        self.assertEqual(self.document_class, converter.document_class)
         self.assertEqual(None, converter.only_fields)
         self.assertEqual(None, converter.exclude_fields)
 
@@ -72,9 +72,9 @@ class DocumentFieldConverterTestCase(TestCase):
         Test ``__init__`` with extra ``fields`` and ``exclude`` arguments.
         """
         converter = DocumentFieldConverter(
-            self.document, fields='fields', exclude='exclude')
+            self.document_class, fields='fields', exclude='exclude')
 
-        self.assertEqual(self.document, converter.document)
+        self.assertEqual(self.document_class, converter.document_class)
         self.assertEqual('fields', converter.only_fields)
         self.assertEqual('exclude', converter.exclude_fields)
 
@@ -82,7 +82,7 @@ class DocumentFieldConverterTestCase(TestCase):
         """
         Test :py:meth:`.DocumentFieldConverter.fields`.
         """
-        converter = DocumentFieldConverter(self.document)
+        converter = DocumentFieldConverter(self.document_class)
         converter.convert = self.convert
 
         self.assertEqual({
@@ -97,7 +97,7 @@ class DocumentFieldConverterTestCase(TestCase):
         Test :py:meth:`.DocumentFieldConverter.fields` with only fields.
         """
         converter = DocumentFieldConverter(
-            self.document,
+            self.document_class,
             fields=['title', 'author']
         )
         converter.convert = self.convert
@@ -112,7 +112,7 @@ class DocumentFieldConverterTestCase(TestCase):
         Test :py:meth:`.DocumentFieldConverter.fields` with excluded fields.
         """
         converter = DocumentFieldConverter(
-            self.document,
+            self.document_class,
             exclude=['body', 'author']
         )
         converter.convert = self.convert

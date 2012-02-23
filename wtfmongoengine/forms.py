@@ -4,9 +4,9 @@ from wtforms.form import Form, FormMeta
 
 class DocumentFieldConverter(object):
     """
-    Convert the given ``document`` into WTForm fields.
+    Convert the given ``document_class`` into WTForm fields.
 
-    :param document:
+    :param document_class:
         The Mongoengine document to convert.
 
     :param fields:
@@ -20,8 +20,8 @@ class DocumentFieldConverter(object):
 
     """
 
-    def __init__(self, document, fields=None, exclude=None):
-        self.document = document
+    def __init__(self, document_class, fields=None, exclude=None):
+        self.document_class = document_class
         self.only_fields = fields
         self.exclude_fields = exclude
 
@@ -41,7 +41,7 @@ class DocumentFieldConverter(object):
 
         """
         field_dict = {}
-        field_names = self.document._fields.keys()
+        field_names = self.document_class._fields.keys()
 
         if self.only_fields:
             field_names = (f for f in field_names if f in self.only_fields)
@@ -50,7 +50,7 @@ class DocumentFieldConverter(object):
                 f for f in field_names if f not in self.exclude_fields)
 
         for field_name in field_names:
-            model_field = self.document._fields[field_name]
+            model_field = self.document_class._fields[field_name]
             wtf_field = self.convert(model_field)
             if wtf_field:
                 field_dict[field_name] = wtf_field
@@ -296,11 +296,11 @@ class DocumentFormMetaClassBase(type):
     """
     def __new__(cls, name, bases, attrs):
         if 'Meta' in attrs:
-            document = attrs['Meta'].document
+            document_class = attrs['Meta'].document_class
             fields = getattr(attrs['Meta'], 'fields', None)
             exclude = getattr(attrs['Meta'], 'exclude', None)
 
-            converter = DocumentFieldConverter(document, fields, exclude)
+            converter = DocumentFieldConverter(document_class, fields, exclude)
             attrs = converter.fields
 
         return super(
@@ -328,7 +328,7 @@ class DocumentForm(Form):
 
         class UserForm(DocumentForm):
             class Meta:
-                document = User
+                document_class = User
 
                 # In case you only want to include ``first_name`` in the form
                 # fields = ('first_name',)

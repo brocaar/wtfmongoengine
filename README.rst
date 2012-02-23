@@ -14,7 +14,7 @@ WTForms-Mongoengine
 
     class UserForm(DocumentForm):
         class Meta:
-            document = User
+            document_class = User
 
             # In case you only want to include ``first_name`` in the form
             # fields = ('first_name',)
@@ -30,6 +30,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~~
 
 * Initial release.
+
 
 Links
 -----

@@ -67,7 +67,7 @@ class DocumentFormTestCase(unittest.TestCase):
 
         class TestForm(DocumentForm):
             class Meta:
-                document = TestDocument
+                document_class = TestDocument
 
         self.test_form = TestForm
 
