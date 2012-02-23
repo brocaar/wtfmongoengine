@@ -37,10 +37,11 @@ WTFMongoengine
 Changelog
 ---------
 
-0.2 (in development)
-~~~~~~~~~~~~~~~~~~~~
+0.1.1
+~~~~~
 
 * Example updates.
+* Fix: README.rst and LICENSE included in package.
 
 0.1
 ~~~
