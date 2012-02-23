@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='WTFMongoengine',
-    version='0.1dev',
+    version='0.1',
     url='http://github.com/brocaar/wtfmongoengine',
     license='BSD',
     author='Orne Brocaar',

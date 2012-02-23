@@ -26,8 +26,8 @@ WTForms-Mongoengine
 Changelog
 ---------
 
-0.1 (in development)
-~~~~~~~~~~~~~~~~~~~~
+0.1
+~~~
 
 * Initial release.
 
