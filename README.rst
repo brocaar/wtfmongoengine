@@ -8,9 +8,20 @@ WTFMongoengine
     from wtfmongoengine.forms import DocumentForm
 
     class User(document.Document):
-        email = fields.StringField(required=True)
-        first_name = fields.StringField(max_length=50)
-        last_name = fields.StringField(max_length=50)
+        first_name = fields.StringField(
+            verbose_name='First name',
+            max_length=50,
+            required=True,
+        )
+        last_name = fields.StringField(
+            verbose_name='Last name',
+            max_length=50,
+            required=False,
+        )
+        email = fields.EmailField(
+            verbose_name='E-mail address',
+            required=True,
+        )
 
     class UserForm(DocumentForm):
         class Meta:
@@ -25,6 +36,11 @@ WTFMongoengine
 
 Changelog
 ---------
+
+0.2 (in development)
+~~~~~~~~~~~~~~~~~~~~
+
+* Example updates.
 
 0.1
 ~~~
