@@ -37,6 +37,12 @@ WTFMongoengine
 Changelog
 ---------
 
+0.1.2
+~~~~~
+
+* Dependency fix (``wtforms`` was in ``tests_require``, needed to be in
+  ``install_requires``).
+
 0.1.1
 ~~~~~
 

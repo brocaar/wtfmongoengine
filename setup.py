@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='WTFMongoengine',
-    version='0.1.1',
+    version='0.1.2',
     url='http://github.com/brocaar/wtfmongoengine',
     license='BSD',
     author='Orne Brocaar',
@@ -13,9 +13,11 @@ setup(
     packages=[
         'wtfmongoengine',
     ],
+    install_requires=[
+        'wtforms',
+    ],
     tests_require=[
         'mock',
-        'wtforms',
         'mongoengine',
         'unittest2',
     ],
